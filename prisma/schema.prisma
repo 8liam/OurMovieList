@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id             String           @id @default(uuid()) @db.Uuid
+  email          String           @unique
+  displayName    String?
+  groupsCreated  Group[]          @relation("GroupCreator")
+  groupMembers   GroupMember[]
+  watchlistItems GroupWatchlist[] @relation("AddedBy")
+}
+
+model Group {
+  id             String           @id @default(uuid()) @db.Uuid
+  name           String
+  createdBy      User             @relation("GroupCreator", fields: [createdById], references: [id])
+  createdById    String           @db.Uuid
+  members        GroupMember[]
+  watchlistItems GroupWatchlist[]
+  createdAt      DateTime         @default(now())
+}
+
+model GroupMember {
+  id                String   @id @default(uuid()) @db.Uuid
+  group             Group    @relation(fields: [groupId], references: [id])
+  groupId           String   @db.Uuid
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String   @db.Uuid
+  hasAcceptedInvite Boolean  @default(false)
+  joinedAt          DateTime @default(now())
+}
+
+model GroupWatchlist {
+  id        String   @id @default(uuid()) @db.Uuid
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String   @db.Uuid
+  addedBy   User     @relation("AddedBy", fields: [addedById], references: [id])
+  addedById String   @db.Uuid
+  movieId   String // e.g. TMDB ID
+  watched   Boolean  @default(false)
+  addedAt   DateTime @default(now())
+}
