@@ -8,11 +8,12 @@ import { revalidatePath } from 'next/cache';
 import { ArrowDownRight, ArrowDownRightFromSquare, Clock, Plus, Trash, Users } from "lucide-react";
 import WatchListMovie from "@/app/components/ui/watchlistmovie";
 
-export default async function GroupPage({ params }) {
+export default async function GroupPage(props) {
+    const params = await props.params;
     const groupId = params.groupId;
 
     // Get the cookieStore once at the top level of the Server Component
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     // Create server-side Supabase client
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

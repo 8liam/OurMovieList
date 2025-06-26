@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request, { params }) {
+export async function GET(request, props) {
+    const params = await props.params;
     const { id } = params;
     const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
