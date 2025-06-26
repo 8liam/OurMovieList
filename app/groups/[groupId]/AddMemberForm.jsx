@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { inviteGroupMember } from "@/lib/actions"; // Adjust path as needed
-
+import { Mail } from "lucide-react"
 export default function AddMemberForm({ groupId, groupCreatorId, currentUserId }) {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState(null);
@@ -27,25 +27,28 @@ export default function AddMemberForm({ groupId, groupCreatorId, currentUserId }
     }
 
     return (
-        <div className="mt-8 p-6 bg-blue-50 rounded-lg shadow-inner">
-            <h2 className="text-xl font-semibold mb-4 text-blue-800">Add New Member</h2>
-            <form onSubmit={handleInvite} className="flex space-x-3">
-                <input
-                    type="email"
-                    placeholder="Enter member's email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                    type="submit"
-                    disabled={isPending}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {isPending ? "Inviting..." : "Invite Member"}
-                </button>
-            </form>
+        <div className="bg-[#0E0E10] border border-[#1C1C21] rounded-xl w-full md:w-auto">
+            <div className="p-4">
+                <form onSubmit={handleInvite} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+
+                    <input
+                        type="email"
+                        placeholder="Enter email to invite"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="bg-[#1C1C21] border-[#0E0E10] border text-white placeholder-gray-400 px-2 text-left rounded-lg h-10 col-span-2 py-2 text-base"
+                    />
+                    <button
+                        type="submit"
+                        disabled={isPending}
+                        className="bg-blue-950 rounded-lg h-10 px-4 flex items-center justify-center gap-1 flex-shrink-0 text-base"
+                    >
+                        {isPending ? "Inviting..." : "Invite"}
+                    </button>
+
+                </form>
+            </div>
             {message && (
                 <p className={`mt-3 text-sm ${message.type === "success" ? "text-green-600" : "text-red-600"}`}>
                     {message.text}

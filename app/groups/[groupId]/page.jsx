@@ -1,12 +1,12 @@
-import { PrismaClient } from "../../generated/prisma";
+import prisma from "@/lib/prisma";
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { redirect } from 'next/navigation';
 import AddMemberForm from './AddMemberForm';
-import { handleLeaveGroupAction, handleDeleteGroupAction } from "@/lib/actions";
+import { handleLeaveGroupAction, handleDeleteGroupAction, markMovieAsWatched, removeMovieFromWatchlist } from "@/lib/actions";
 import { revalidatePath } from 'next/cache';
-
-const prisma = new PrismaClient();
+import { ArrowDownRight, ArrowDownRightFromSquare, Clock, Plus, Trash, Users } from "lucide-react";
+import WatchListMovie from "@/app/components/ui/watchlistmovie";
 
 export default async function GroupPage({ params }) {
     const groupId = params.groupId;
@@ -108,69 +108,108 @@ export default async function GroupPage({ params }) {
     // Determine if the current user is the group creator
     const isGroupCreator = group.createdById === currentUser.id;
 
+    // Filter watchlist items into watched and unwatched
+    const unwatchedItems = group.watchlistItems.filter(item => !item.watched);
+    const watchedItems = group.watchlistItems.filter(item => item.watched);
+
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-                <h1 className="text-3xl font-bold mb-4 text-gray-900">{group.name}</h1>
-                <p className="text-gray-600 mb-2">
-                    Created by: {group.createdBy?.displayName || group.createdBy?.email || 'Unknown'} on {new Date(group.createdAt).toLocaleDateString()}
-                </p>
 
-                <div className="mt-6">
-                    <h2 className="text-xl font-semibold mb-3">Group Members:</h2>
-                    <ul className="list-disc list-inside space-y-1">
-                        {group.members.map(member => (
-                            <li key={member.id} className="text-gray-700">
-                                {member.user?.displayName || member.user?.email || 'Unknown User'}
-                                {!member.hasAcceptedInvite && (
-                                    <span className="text-gray-500">(Pending)</span>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+        <div className="max-w-7xl mx-auto space-y-8 mt-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{group.name}</h1>
+                    <p className="text-gray-400">Your group's movie collection and watchlist</p>
                 </div>
-
                 <AddMemberForm
                     groupId={groupId}
                     groupCreatorId={group.createdById}
                     currentUserId={currentUser.id}
                 />
+            </div>
+            <div className="bg-[#0E0E10] border border-[#1C1C21] p-4 rounded-xl space-y-5">
+                <h2 className="flex items-center gap-2 text-white text-2xl font-semibold">
+                    <Users className="w-5 h-5" /> Group Members
+                </h2>
 
-                <div className="mt-6 flex space-x-4">
-                    {!isGroupCreator && (
-                        <form action={handleLeaveGroupAction.bind(null, groupId)}>
-                            <button type="submit" className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors">
-                                Leave Group
-                            </button>
-                        </form>
-                    )}
-                    {isGroupCreator && (
-                        <form action={handleDeleteGroupAction.bind(null, groupId)}>
-                            <button type="submit" className="bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800 transition-colors">
-                                Delete Group
-                            </button>
-                        </form>
-                    )}
-                </div>
+                <div className="grid grid-cols-5 gap-2">
+                    {group.members.map(member => (
+                        <div key={member.id} className="text-white bg-[#1C1C21] rounded-lg text-center p-4">
+                            {member.user?.displayName || member.user?.email || 'Unknown User'}
 
-                <div className="mt-8">
-                    <h2 className="text-xl font-semibold mb-3">Watchlist:</h2>
-                    {group.watchlistItems.length > 0 ? (
-                        <ul className="space-y-3">
-                            {group.watchlistItems.map(item => (
-                                <li key={item.id} className="bg-gray-50 p-3 rounded-md shadow-sm flex justify-between items-center">
-                                    <span className="font-medium">Movie ID: {item.movieId}</span>
-                                    <span className={`text-sm ${item.watched ? 'text-green-600' : 'text-red-600'}`}>
-                                        {item.watched ? 'Watched' : 'Unwatched'}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-gray-600">No items in the watchlist yet.</p>
-                    )}
+                            {!member.hasAcceptedInvite && (
+                                <span className="text-gray-500">(Pending)</span>
+                            )}
+                        </div>
+                    ))}
                 </div>
             </div>
+            {/* Watch List (Unwatched) */}
+            {unwatchedItems.length > 0 && (
+                <div className="bg-[#0E0E10] border border-[#1C1C21] p-4 rounded-xl space-y-5">
+                    <h2 className="flex items-center gap-2 text-white text-2xl font-semibold">
+                        <Plus className="w-5 h-5" /> Watch List ({unwatchedItems.length})
+                    </h2>
+
+                    <div className="grid grid-cols-5 gap-4">
+                        {unwatchedItems
+                            .map(item => (
+                                <WatchListMovie
+                                    id={item.movieId}
+                                    key={item.id}
+                                    watchlistItemId={item.id}
+                                    groupId={groupId}
+                                    markMovieAsWatched={markMovieAsWatched}
+                                    removeMovieFromWatchlist={removeMovieFromWatchlist}
+                                    isWatched={item.watched}
+                                />
+                            ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Watch List (Watched) */}
+            {watchedItems.length > 0 && (
+                <div className="bg-[#0E0E10] border border-[#1C1C21] p-4 rounded-xl space-y-5">
+                    <h2 className="flex items-center gap-2 text-white text-2xl font-semibold">
+                        <Clock className="w-5 h-5" /> Recently Watched ({watchedItems.length})
+                    </h2>
+
+                    <div className="grid grid-cols-5 gap-4">
+                        {watchedItems
+                            .slice().reverse()
+                            .map(item => (
+                                <WatchListMovie
+                                    id={item.movieId}
+                                    key={item.id}
+                                    watchlistItemId={item.id}
+                                    groupId={groupId}
+                                    markMovieAsWatched={markMovieAsWatched}
+                                    removeMovieFromWatchlist={removeMovieFromWatchlist}
+                                    isWatched={item.watched}
+                                />
+                            ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="mt-6 flex space-x-4">
+                {!isGroupCreator && (
+                    <form action={handleLeaveGroupAction.bind(null, groupId)}>
+                        <button type="submit" className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors">
+                            Leave Group
+                        </button>
+                    </form>
+                )}
+                {isGroupCreator && (
+                    <form action={handleDeleteGroupAction.bind(null, groupId)}>
+                        <button type="submit" className="bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800 transition-colors">
+                            Delete Group
+                        </button>
+                    </form>
+                )}
+            </div>
+
+
         </div>
     );
 } 

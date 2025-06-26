@@ -1,11 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/header";
-import { PrismaClient } from "./generated/prisma";
+import prisma from "../lib/prisma";
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-
-const prisma = new PrismaClient();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +31,8 @@ export default async function RootLayout({ children }) {
     supabaseAnonKey,
     {
       cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
+        async getAll() {
+          return await cookieStore.getAll();
         },
       },
     }
