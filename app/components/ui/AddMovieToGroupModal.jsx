@@ -13,7 +13,6 @@ export default function AddMovieToGroupModal({
     addedMoviesTracker,
     handleClientMovieAdd,
 }) {
-    console.log("AddMovieToGroupModal: All props received:", { isOpen, onClose, movie, userGroups, addMovieToGroupWatchlistAction, onAddSuccess, addedMoviesTracker, handleClientMovieAdd }); // DEBUG LOG: All props
 
     const currentAddedMoviesTracker = addedMoviesTracker instanceof Map ? addedMoviesTracker : new Map();
 

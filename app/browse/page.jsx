@@ -2,7 +2,7 @@ import { fetchUserGroupsAction } from "@/lib/actions";
 import BrowseContent from "./BrowseContent"; // Import the new client component
 
 export default async function Browse(props) {
-    const resolvedSearchParams = await Promise.resolve(props.searchParams);
+    const resolvedSearchParams = await Promise.resolve((await props.searchParams));
     const searchQuery = resolvedSearchParams.query || '';
     const moviesPerPage = 20; // Number of movies to fetch per page
     const page = parseInt(resolvedSearchParams.page) || 1;
@@ -29,7 +29,7 @@ export default async function Browse(props) {
         if (searchQuery) {
             apiUrl = `/api/search-movies?query=${encodeURIComponent(searchQuery)}&page=${page}`;
         } else {
-            apiUrl = `/api/trending?page=${page}`;
+            apiUrl = `${protocol}${host}/api/trending?page=${page}`;
         }
 
         const response = await fetch(apiUrl);
