@@ -65,18 +65,18 @@ export default function CreateGroupPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Create New Group</h2>
+        <section id="create-groups" className="xl:max-w-7xl lg:max-w-4xl md:max-w-2xl sm:max-w-xl max-w-sm mx-auto space-y-8 mt-6 md:mt-12">
+            <div className="bg-[#0E0E10] border border-[#1C1C21] p-4 rounded-xl space-y-5">
+                <h1 className="text-3xl font-bold mb-6 ">Your Groups</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label htmlFor="groupName" className="block text-gray-700 text-sm font-bold mb-2">
+                        <label htmlFor="groupName" className="block text-xl font-bold mb-2">
                             Group Name
                         </label>
                         <input
                             type="text"
                             id="groupName"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 bg-[#1C1C21] leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter group name"
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
@@ -93,7 +93,6 @@ export default function CreateGroupPage() {
                         </button>
                     </div>
                 </form>
-
                 {successMessage && (
                     <p className="mt-4 text-center text-green-600 text-sm">{successMessage}</p>
                 )}
@@ -101,6 +100,6 @@ export default function CreateGroupPage() {
                     <p className="mt-4 text-center text-red-600 text-sm">{error}</p>
                 )}
             </div>
-        </div>
+        </section>
     );
 } 

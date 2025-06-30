@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { fetchUserGroupsAction, addMovieToGroupWatchlistAction } from "@/lib/actions"; // Import ONLY group-related actions
+import { Calendar, Clock, Globe, Star, Tag } from "lucide-react";
 
 
 export default function MoviePage({ params }) {
@@ -20,6 +21,7 @@ export default function MoviePage({ params }) {
             try {
                 const res = await fetch(`/api/movie?id=${movieId}`);
                 const data = await res.json();
+                console.log(data.genres[0])
 
                 if (res.ok) {
                     setMovie(data); // Set the full movie data
@@ -43,7 +45,7 @@ export default function MoviePage({ params }) {
                     setSelectedGroup(result.groups[0].id); // Select the first group by default
                 }
             } else {
-                console.error("Error fetching user groups:", result.error);
+                console.log("Error fetching user groups:", result.error);
                 setFeedbackMessage({ type: 'error', message: result.error });
             }
         }
@@ -69,60 +71,81 @@ export default function MoviePage({ params }) {
     };
 
     return (
-        <div>
+        <section id="trending" className="xl:max-w-7xl lg:max-w-4xl md:max-w-2xl sm:max-w-xl max-w-sm mx-auto space-y-8 mt-6 md:mt-12">
             {loading ? (
                 <p>Loading...</p>
             ) : movie ? (
-                <div className="p-4">
-                    <h1 className="text-2xl font-bold mb-4">{movie.title}</h1>
-                    <img
-                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                        alt={movie.title}
-                        className="rounded-lg mb-4"
-                    />
-                    <p className="text-gray-700 mb-4">{movie.overview}</p>
-                    <p>Release Date: {movie.release_date}</p>
-                    <p>Vote Average: {movie.vote_average}</p>
-
-                    <div className="mt-6">
-                        <h2 className="text-xl font-semibold mb-3">Add to Group Watchlist:</h2>
-                        <div className="flex flex-col space-y-4">
-                            {userGroups.length > 0 ? (
-                                <div className="flex flex-col">
-                                    <label htmlFor="group-select" className="mb-2 text-gray-700">Select Group:</label>
-                                    <select
-                                        id="group-select"
-                                        value={selectedGroup}
-                                        onChange={(e) => setSelectedGroup(e.target.value)}
-                                        className="p-2 border border-gray-300 rounded-md bg-white text-gray-900"
-                                    >
-                                        {userGroups.map((group) => (
-                                            <option key={group.id} value={group.id}>
-                                                {group.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <button
-                                        onClick={handleAddToGroupWatchlist}
-                                        className="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-                                    >
-                                        Add to Group Watchlist
-                                    </button>
+                <div className="bg-[#0E0E10] border border-[#1C1C21] p-4 rounded-xl space-y-5">
+                    <h1 className="text-4xl font-bold mb-4">{movie.title}</h1>
+                    <div className="flex flex-col lg:flex-row gap-4 text-white ">
+                        <img
+                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                            alt={movie.title}
+                            className="rounded-lg "
+                        />
+                        <div className="space-y-5">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-[#1C1C21] border border-[#0E0E10] p-4 flex flex-row gap-4">
+                                    <span><Calendar /></span>
+                                    <span>{movie.release_date}</span>
                                 </div>
-                            ) : (
-                                <p className="text-gray-600">You are not part of any groups yet. Create or join a group to add movies to its watchlist.</p>
-                            )}
+                                <div className="bg-[#1C1C21] border border-[#0E0E10] p-4 flex flex-row gap-4">
+                                    <span><Star /></span>
+                                    <span>{movie.vote_average.toFixed(2)} / 10</span>
+                                </div>
+                                <div className="bg-[#1C1C21] border border-[#0E0E10] p-4 flex flex-row gap-4">
+                                    <span><Tag /></span>
+                                    <span>{movie.genres[0].name}</span>
+                                </div>
+                                <div className="bg-[#1C1C21] border border-[#0E0E10] p-4 flex flex-row gap-4">
+                                    <span><Clock /></span>
+                                    <span>{movie.runtime} minutes</span>
+                                </div>
+                            </div>
+                            <p className="">{movie.overview}</p>
+
+                            {userGroups.length > 0 ? (
+                                <div className="mt-6">
+                                    <h2 className="text-xl font-semibold">Add to Group Watchlist</h2>
+                                    <div className="flex flex-col space-y-4">
+
+                                        <div className="flex flex-col">
+                                            <label htmlFor="group-select" className="mb-2">Select Group:</label>
+                                            <select
+                                                id="group-select"
+                                                value={selectedGroup}
+                                                onChange={(e) => setSelectedGroup(e.target.value)}
+                                                className="p-2 border border-gray-300 rounded-md bg-white text-gray-900"
+                                            >
+                                                {userGroups.map((group) => (
+                                                    <option key={group.id} value={group.id}>
+                                                        {group.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <button
+                                                onClick={handleAddToGroupWatchlist}
+                                                className="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
+                                            >
+                                                Add to Group Watchlist
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                    {feedbackMessage.message && (
+                                        <p className={`mt-4 ${feedbackMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                                            {feedbackMessage.message}
+                                        </p>
+                                    )}
+                                </div>
+                            ) : null}
                         </div>
-                        {feedbackMessage.message && (
-                            <p className={`mt-4 ${feedbackMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                                {feedbackMessage.message}
-                            </p>
-                        )}
                     </div>
                 </div>
             ) : (
                 <p>Movie not found or an error occurred.</p>
             )}
-        </div>
+        </section>
     );
 }

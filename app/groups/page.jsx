@@ -3,11 +3,28 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchUserGroupsAction } from "@/lib/actions"; // Import the server action
+import { supabase } from "../../lib/supabaseClient"
+import { Plus } from "lucide-react";
 
-export default function Groups() {
+
+export default function Groups(currentUser) {
     const [userGroups, setUserGroups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [user, setUser] = useState(currentUser)
+
+
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (event, session) => {
+                setUser(session?.user || null)
+            }
+        )
+
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [])
 
     useEffect(() => {
         async function getGroups() {
@@ -35,48 +52,61 @@ export default function Groups() {
         return (
             <section id="groups" className="min-h-screen">
                 <div className="text-white py-8 xl:px-24 px-4 mx-auto p-6 rounded-lg shadow-md">
-                    <h1 className="text-3xl font-bold mb-6 ">Your Groups</h1>
+                    {/* Skeleton for "Your Groups" title */}
+                    <div className="h-9 w-64 mb-6 bg-[#1c1c24] animate-pulse rounded"></div>
 
                     <div className="gap-2 grid grid-cols-3">
+                        {/* Single skeleton item */}
+                        <div className="bg-[#1c1c24] p-4 rounded-md shadow-sm animate-pulse transition-colors h-16">
 
-                        <div className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
-
-                            <h2 className="text-xl font-semibold mb-1">{" "}</h2>
                         </div>
                     </div>
-
-                    <p className="text-gray-700">You are not a member of any groups yet. Create or join a group to see it here!</p>
-
                 </div>
             </section>
         );
     }
 
-    if (error) {
+    if (!user) {
         return (
-            <section id="groups" className="p-8">
-                <p className="text-red-600">Error: {error}</p>
+            <section id="groups" className="min-h-screen">
+                <div className="text-white py-8 xl:px-24 px-4 mx-auto p-6 rounded-lg shadow-md">
+                    <h1 className="text-3xl font-bold mb-6 ">Sign Up to Join Groups</h1>
+                    <div className="gap-2 grid grid-cols-3">
+                        <Link href={`/auth`} className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
+                            <h2 className="text-xl font-semibold mb-1 flex gap-2 items-center"><Plus />Sign Up</h2>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+        )
+    }
+
+    if (user) {
+        return (
+            <section id="groups" className="min-h-screen">
+                <div className="text-white py-8 xl:px-24 px-4 mx-auto p-6 rounded-lg shadow-md">
+                    <h1 className="text-3xl font-bold mb-6 ">Your Groups</h1>
+                    {userGroups.length > 0 ? (
+                        <div className="gap-2 grid grid-cols-3">
+                            {userGroups.map((group) => (
+                                <Link href={`/groups/${group.id}`} key={group.id} className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
+
+                                    <h2 className="text-xl font-semibold mb-1">{group.name}</h2>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <>
+
+                            <div className="gap-2 grid grid-cols-3">
+                                <Link href={`/groups/create`} className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
+                                    <h2 className="text-xl font-semibold mb-1 flex gap-2 items-center"><Plus /> Create Group</h2>
+                                </Link>
+                            </div>
+                        </>
+                    )}
+                </div>
             </section>
         );
     }
-
-    return (
-        <section id="groups" className="min-h-screen">
-            <div className="text-white py-8 xl:px-24 px-4 mx-auto p-6 rounded-lg shadow-md">
-                <h1 className="text-3xl font-bold mb-6 ">Your Groups</h1>
-                {userGroups.length > 0 ? (
-                    <div className="gap-2 grid grid-cols-3">
-                        {userGroups.map((group) => (
-                            <Link href={`/groups/${group.id}`} key={group.id} className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
-
-                                <h2 className="text-xl font-semibold mb-1">{group.name}</h2>
-                            </Link>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-gray-700">You are not a member of any groups yet. Create or join a group to see it here!</p>
-                )}
-            </div>
-        </section>
-    );
 }

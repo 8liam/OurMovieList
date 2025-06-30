@@ -24,15 +24,18 @@ export default async function RootLayout({ children }) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
 
   const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,
     {
       cookies: {
-        async getAll() {
-          return await cookieStore.getAll();
+        get: (name) => cookieStore.get(name)?.value,
+        set: () => { /* Do nothing */ },
+        remove: () => { /* Do nothing */ },
+        getAll() {
+          return cookieStore.getAll();
         },
       },
     }

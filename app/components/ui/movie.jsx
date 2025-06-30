@@ -1,50 +1,19 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Plus } from "lucide-react";
+import { addMovieToGroupWatchlistAction } from "@/lib/actions";
+import AddMovieToGroupModal from "./AddMovieToGroupModal";
 
-export default function Movie({ id, title, poster, userGroups, addMovieToGroupWatchlistAction, loading: movieLoading }) {
-    const [selectedGroup, setSelectedGroup] = useState('');
-    const [isAdded, setIsAdded] = useState(false);
+export default function Movie({ id, title, poster, userGroups, loading: movieLoading, onWatchlistAddSuccess, addedMoviesTracker, handleClientMovieAdd }) {
+    const [showModal, setShowModal] = useState(false);
 
-    // Set initial selected group and check if movie is already added
-    useEffect(() => {
-        if (userGroups && userGroups.length > 0) {
-            // If no group is selected, default to the first one
-            const initialGroup = selectedGroup ? userGroups.find(g => g.id === selectedGroup) : userGroups[0];
-            if (initialGroup) {
-                setSelectedGroup(initialGroup.id);
-                const movieAlreadyInWatchlist = initialGroup.watchlistItems.some(item => item.movieId === String(id));
-                setIsAdded(movieAlreadyInWatchlist);
-            }
-        }
-    }, [userGroups, selectedGroup, id]);
-
-    const handleAddToGroupWatchlist = async () => {
-        if (!selectedGroup) {
-            // This case should ideally not happen if initialGroup selection works, but as a fallback
-            return;
-        }
-        setIsAdded(false); // Reset to allow adding again if user changes group
-        const result = await addMovieToGroupWatchlistAction(selectedGroup, id);
-        if (result.success) {
-            setIsAdded(true);
-        } else {
-            // Optionally, handle error state or revert button text if not successful
-            console.error("Failed to add movie to watchlist:", result.error || result.message);
-        }
+    const handleOpenModal = () => {
+        setShowModal(true);
     };
 
-    const handleGroupChange = (e) => {
-        const newSelectedGroupId = e.target.value;
-        setSelectedGroup(newSelectedGroupId);
-        // Check if the movie is already in the newly selected group
-        const selectedGroupData = userGroups.find(g => g.id === newSelectedGroupId);
-        if (selectedGroupData) {
-            const movieAlreadyInWatchlist = selectedGroupData.watchlistItems.some(item => item.movieId === String(id));
-            setIsAdded(movieAlreadyInWatchlist);
-        } else {
-            setIsAdded(false);
-        }
+    const handleCloseModal = () => {
+        setShowModal(false);
     };
 
     if (movieLoading) {
@@ -57,46 +26,44 @@ export default function Movie({ id, title, poster, userGroups, addMovieToGroupWa
     }
 
     return (
-        <div className="bg-[#1c1c24] rounded-lg w-full flex-none overflow-hidden">
-            <Link href={`/movie/${id}`}>
+        <div className="bg-[#1c1c24] rounded-lg w-full pb-[150%] relative group">
+            <Link href={`/movie/${id}`} className="absolute inset-0">
                 <img
-                    alt={title}
-                    className="object-cover rounded-t-lg w-full"
-                    src={poster}
+                    alt={title || 'Movie Poster'}
+                    className="object-cover rounded-lg w-full h-full"
+                    src={poster ? `https://image.tmdb.org/t/p/w500${poster}` : '/no-image-available.png'}
                 />
             </Link>
-            <div className="p-2 text-sm">
-                <div className="flex flex-col space-y-2">
-                    {userGroups.length > 0 ? (
-                        <>
-                            <select
-                                value={selectedGroup}
-                                onChange={handleGroupChange}
-                                className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 w-full"
-                            >
-                                {userGroups.map((group) => (
-                                    <option key={group.id} value={group.id}>
-                                        {group.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <button
-                                onClick={handleAddToGroupWatchlist}
-                                disabled={isAdded}
-                                className={`px-2 py-2 rounded-md transition-colors w-full flex items-center justify-center gap-1 ${isAdded ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
-                            >
-                                {isAdded ? (
-                                    <><Check className="w-4 h-4" /> Added to group</>
-                                ) : (
-                                    'Add to Group'
-                                )}
-                            </button>
-                        </>
-                    ) : (
-                        <p className="text-xs text-gray-400">Join a group to add movies to its watchlist.</p>
-                    )}
-                </div>
-            </div>
+            {userGroups.length <= 0 ? (
+                null
+            ) : (
+                <>
+                    <div className="absolute bottom-2 left-2">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleOpenModal(); }}
+                            className="bg-green-950/90 border border-green-600/50 hover:bg-green-700 text-white p-2 rounded-md shadow-lg duration-300 group/icon relative lg:opacity-0 group-hover:opacity-100"
+                            aria-label="Add to Watchlist"
+                        >
+                            <Plus className="w-5 h-5" />
+                            {/* Tooltip for Plus icon */}
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 lg:group-hover/icon:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                                Add to Watchlist
+                            </span>
+                        </button>
+                    </div>
+
+                    <AddMovieToGroupModal
+                        isOpen={showModal}
+                        onClose={handleCloseModal}
+                        movie={{ id, title, poster }}
+                        userGroups={userGroups}
+                        addMovieToGroupWatchlistAction={addMovieToGroupWatchlistAction}
+                        onAddSuccess={onWatchlistAddSuccess}
+                        addedMoviesTracker={addedMoviesTracker}
+                        handleClientMovieAdd={handleClientMovieAdd}
+                    />
+                </>
+            )}
         </div>
     );
 }
