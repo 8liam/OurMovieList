@@ -55,7 +55,7 @@ export default function Groups({ currentUser }) {
                     {/* Skeleton for "Your Groups" title */}
                     <div className="h-9 w-64 mb-6 bg-[#1c1c24] animate-pulse rounded"></div>
 
-                    <div className="gap-2 grid grid-cols-3">
+                    <div className="gap-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                         {/* Single skeleton item */}
                         <div className="bg-[#1c1c24] p-4 rounded-md shadow-sm animate-pulse transition-colors h-16">
 
@@ -71,7 +71,7 @@ export default function Groups({ currentUser }) {
             <section id="create-groups" className="xl:max-w-7xl lg:max-w-4xl md:max-w-2xl sm:max-w-xl max-w-sm mx-auto space-y-8 mt-6 md:mt-12">
                 <div className="bg-[#0E0E10] border border-[#1C1C21] p-4 rounded-xl space-y-5">
                     <h1 className="text-3xl font-bold mb-6 ">Sign Up to Join Groups</h1>
-                    <div className="gap-2 grid grid-cols-3">
+                    <div className="gap-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                         <Link href={`/auth`} className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
                             <h2 className="text-xl font-semibold mb-1 flex gap-2 items-center"><Plus />Sign Up</h2>
                         </Link>
@@ -87,7 +87,7 @@ export default function Groups({ currentUser }) {
                 <div className="bg-[#0E0E10] border border-[#1C1C21] p-4 rounded-xl space-y-5">
                     <h1 className="text-3xl font-bold mb-6 ">Your Groups</h1>
                     {userGroups.length > 0 ? (
-                        <div className="gap-2 grid grid-cols-3">
+                        <div className="gap-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                             {userGroups.map((group) => (
                                 <Link href={`/groups/${group.id}`} key={group.id} className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
 
@@ -101,7 +101,7 @@ export default function Groups({ currentUser }) {
                     ) : (
                         <>
 
-                            <div className="gap-2 grid grid-cols-3">
+                            <div className="gap-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                                 <Link href={`/groups/create`} className="bg-[#1c1c24] p-4 rounded-md shadow-sm  transition-colors">
                                     <h2 className="text-xl font-semibold mb-1 flex gap-2 items-center"><Plus /> Create Group</h2>
                                 </Link>

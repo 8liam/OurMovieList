@@ -74,8 +74,8 @@ export default function AuthPage() {
     return (
         <section id="Auth" className="xl:max-w-5xl lg:max-w-4xl md:max-w-2xl sm:max-w-xl max-w-sm mx-auto space-y-8 mt-6 md:mt-12">
             <div className="bg-[#0E0E10] border border-[#1C1C21] rounded-xl space-y-5 ">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="p-4  flex flex-col justify-center order-2 lg:order-1">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ">
+                    <div className="p-4  flex flex-col justify-center order-2 lg:order-1 ">
                         <h1 className="text-2xl font-bold mb-6 text-center">
                             {isSignUp ? "Sign Up" : "Sign In"}
                         </h1>
@@ -150,8 +150,8 @@ export default function AuthPage() {
                             </button>
                         </p>
                     </div>
-                    <div className="order-1 lg:order-2">
-                        <Image src="/login.jpg" alt="Descriptive Image of Application" width={500} height={750} className="object-cover w-full h-full rounded-r-xl" />
+                    <div className="order-1 lg:order-2 max-h-[70vh]">
+                        <Image src="/login.jpg" alt="Descriptive Image of Application" width={500} height={750} className="object-cover w-full h-[40vh] lg:h-full rounded-r-xl" />
                     </div>
                 </div>
             </div>
