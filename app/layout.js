@@ -4,7 +4,7 @@ import Header from "./components/header";
 import prisma from "../lib/prisma";
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-
+import { Analytics } from "@vercel/analytics/next"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -72,6 +72,7 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Analytics />
         <Header currentUser={currentUser} pendingInvitations={pendingInvitations} />
         <main>{children}</main>
       </body>

@@ -27,7 +27,7 @@ export default async function Browse(props) {
 
         let apiUrl = '';
         if (searchQuery) {
-            apiUrl = `/api/search-movies?query=${encodeURIComponent(searchQuery)}&page=${page}`;
+            apiUrl = `${protocol}${host}/api/search-movies?query=${encodeURIComponent(searchQuery)}&page=${page}`;
         } else {
             apiUrl = `${protocol}${host}/api/trending?page=${page}`;
         }
