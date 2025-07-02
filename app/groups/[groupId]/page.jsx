@@ -132,7 +132,7 @@ export default async function GroupPage(props) {
                     <Users className="w-5 h-5" /> Group Members
                 </h2>
 
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     {group.members.map(member => (
                         <div key={member.id} className="text-white bg-[#1C1C21] rounded-lg text-center p-4">
                             {member.user?.displayName || member.user?.email || 'Unknown User'}
@@ -151,7 +151,7 @@ export default async function GroupPage(props) {
                         <Plus className="w-5 h-5" /> Watch List ({unwatchedItems.length})
                     </h2>
 
-                    <div className="grid grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                         {unwatchedItems
                             .map(item => (
                                 <WatchListMovie
@@ -175,7 +175,7 @@ export default async function GroupPage(props) {
                         <Clock className="w-5 h-5" /> Recently Watched ({watchedItems.length})
                     </h2>
 
-                    <div className="grid grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                         {watchedItems
                             .slice().reverse()
                             .map(item => (
