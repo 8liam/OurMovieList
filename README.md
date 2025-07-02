@@ -1,5 +1,6 @@
 # 🎬 OurMovieList 
 
+![OurMovieList](https://i.imgur.com/SfLi3Ic.png)
 ### Collaborative Movie Discovery & Watchlists
 
 Welcome to **OurMovieList**, a dynamic and interactive web application designed to enhance how friends and groups discover, manage, and share their favorite movies. This platform offers a seamless experience for tracking trending films, creating and managing private groups, and building shared watchlists, fostering a collaborative movie-watching journey.
